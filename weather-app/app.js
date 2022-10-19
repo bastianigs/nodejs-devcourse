@@ -1,91 +1,35 @@
-const request = require("postman-request");
-const yargs = require("yargs");
 const chalk = require("chalk");
 
-const url = "http://api.weatherstack.com/current?access_key=e08c63b54494ce631f66f77f24174a44&query=37.8267,-122.4233";
+const geocode = require("./utils/geocode.js");
+const forecast = require("./utils/forecast.js");
+//----------------------------------------------------------------
 
-// request({ url: url, json: true }, (error, response) => {
-//     const current = response.body.current;
-//     console.log( current.weather_descriptions[0] + " - It is currently " + current.temperature + " degrees out, but it feels like " + current.feelslike + " degrees." );
-// })
-
-// Geocoding  => take a city/region name and convert it into lat & long
-// Address -> Lat/Long -> Weather
-
-// const coordsURL = "https://api.mapbox.com/geocoding/v5/mapbox.places/Los%20Angeles.json?limit=1&access_token=pk.eyJ1Ijoic3NlZWJieXkiLCJhIjoiY2w5ZTZ4ZTFtMGZ3ZDN3bDkycG15eGVsayJ9._qmfu-45CI6J3C03qY8icg";
-
-// request({ url: coordsURL, json: true }, (error, response) => {
-//     const [ lat, long ] = response.body.features[0].center;
-//     console.log( "Los Angeles' Coords: " + lat + ", " + long);
-// })
-
-const geocode = locationName => {
-    const coordsURL = "https://api.mapbox.com/geocoding/v5/mapbox.places/" + locationName + ".json?limit=1&access_token=pk.eyJ1Ijoic3NlZWJieXkiLCJhIjoiY2w5ZTZ4ZTFtMGZ3ZDN3bDkycG15eGVsayJ9._qmfu-45CI6J3C03qY8icg";
-
-    request({ url: coordsURL, json: true }, (error, response) => {
-        if (error) console.log( "Unable to connect to mapbox service!" );
-        else if (response.body.error) console.log( "Unable to find location" );
-        else {
-            const [ long, lat ] = response.body.features[0].center;
-            console.log( locationName + " Coords: " + lat + ", " + long);
-        }
+const getGeocode = locationName => {
+    geocode( locationName, (error, { loc, lat, long }) => {
+        if (error) return console.log( error );
+        console.log( loc + " Coords: " + lat + ", " + long);
     })
 }
 
-const getWeather = locationName => {
-    const coordsURL = "https://api.mapbox.com/geocoding/v5/mapbox.places/" + locationName + ".json?limit=1&access_token=pk.eyJ1Ijoic3NlZWJieXkiLCJhIjoiY2w5ZTZ4ZTFtMGZ3ZDN3bDkycG15eGVsayJ9._qmfu-45CI6J3C03qY8icg";
+const getForecast = locationName => {
+    geocode( locationName, (error, { loc, lat, long } = {}) => {
+        if (error) return console.log( "Error:", error );
+        console.log( chalk.green.bgWhite("Weather for " + chalk.bold( loc )) );
 
-    request({ url: coordsURL, json: true }, (error, response) => {
-        if (error) console.log( "Unable to connect to mapbox service!" );
-        else if (response.body.features.length === 0) console.log( "Unable to find location" );
-        else {
-            const loc = response.body.features[0].text;
-            const [ long, lat ] = response.body.features[0].center;
-
-            console.log( chalk.green.bgWhite("Weather for " + chalk.bold(loc)) );
-
-            const weatherURL = "http://api.weatherstack.com/current?access_key=e08c63b54494ce631f66f77f24174a44&query=" + long + "," + lat;
-            request({ url: weatherURL, json: true }, (error, response) => {
-                if (error) console.log( "Unable to connect to weather service!" );
-                else if (response.body.error) console.log( "Unable to find location weather..." );
-                else {
-                    // console.log( locationName + " Coords: " + lat + ", " + long);
-                    const current = response.body.current;
-                    console.log( chalk.bgGreen(current.weather_descriptions[0] + " - It is currently " + current.temperature + " degrees out, but it feels like " + current.feelslike + " degrees.") );
-                }
-            })
-        }
+        forecast( lat, long, (error, { weather_descriptions:description, temperature, feelslike } = {}) => {
+            if (error) return console.log( "Error:", error );
+            console.log( chalk.bgGreen( description + " - It is currently " + temperature + " degrees out, but it feels like " + feelslike + " degrees." ) );
+        })
     })
 }
 
-yargs.command({
-    command: "geocode",
-    describe: "Return coords of a specified location.",
-    builder: {
-        loc: {
-            describe: "Location name",
-            demandOption: true,
-            type: 'string'
-        }
-    },
-    handler (argv) {
-        geocode( argv.loc );
-    }
-})
+const isError = string => chalk.red(string);
 
-yargs.command({
-    command: "weather",
-    describe: "Weather Forecast",
-    builder: {
-        loc: {
-            describe: "Location name",
-            demandOption: true,
-            type: 'string'
-        }
-    },
-    handler (argv) {
-        getWeather(argv.loc);
-    }
-})
+const cmd = process.argv[2];
+if (!cmd) return console.log( isError('Available commands: geocode <locName>, weather <locName>') );
+else if (cmd !== "geocode" && cmd !== "weather") return console.log( isError('Available commands: geocode <locName>, weather <locName>') );
 
-yargs.parse();
+const location = process.argv[3];
+if (!location) return console.log( isError('Error - Correct syntax: ' + cmd + ' <locationName>') );
+else if (cmd == "geocode") getGeocode(location);
+else if (cmd == "weather") getForecast(location);
