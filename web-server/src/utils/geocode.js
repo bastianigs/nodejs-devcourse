@@ -6,7 +6,7 @@ const geocode = (locationName, callback) => {
 
     request({ url: coordsURL, json: true }, (error, { body } = {}) => {
         if (error) return callback( "Unable to connect to mapbox service!" );
-        else if (!body) return callback( "Unable to find location. Try another search." );
+        else if (!body.features[0]) return callback( "Unable to find location. Try another search." );
 
         const [ loc, long, lat ] = [ body.features[0].place_name, ...body.features[0].center ];
         callback( undefined, { loc, lat, long } );

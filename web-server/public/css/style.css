@@ -3,6 +3,23 @@ h1 {
     margin-bottom: 48px;
 }
 
+input {
+    border: 1px solid lightgrey;
+    padding: 10px;
+}
+
+button {
+    cursor: pointer;
+    border: 1px solid grey;
+    background: grey;
+    padding: 10px;
+    color: white;
+}
+
+button:hover {
+    background: black;
+}
+
 header {
     margin: 16px 0 48px 0;
 }
@@ -15,6 +32,10 @@ header a {
 
 .avatar {
     width: 100px;
+}
+
+#message-1, #message-2 {
+    color: grey;
 }
 
 body {
