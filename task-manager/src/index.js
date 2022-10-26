@@ -1,7 +1,5 @@
 const express = require( 'express' );
 require( './db/mongoose' ); // will just make sure mongoose.js runs. (and will connect to the db)
-// const User = require( './models/user')
-// const Task = require( './models/task')
 
 const userRouter = require('./routers/user')
 const taskRouter = require('./routers/task')
@@ -11,6 +9,18 @@ const port = process.env.PORT || 3000;
 
 //--------------------------------------------------------------
 
+// app.use((req, res, next) => {
+//     if (req.method === 'GET') {
+//         res.send('GET requests are disabled.')
+//     } else {
+//         next()
+//     }
+// })
+
+// app.use((req, res, next) => {
+//     res.status(503).send('Server is currently in maintenance mode. Please come back later!')
+// })
+
 app.use(express.json());
 app.use(userRouter)
 app.use(taskRouter)
@@ -19,17 +29,18 @@ app.listen( port, () => {
     console.log( 'Server is up on port ' + port );
 })
 
-const bcrypt = require('bcryptjs')
 
-const myFunction = async () => {
-    const password = 'Red12345!'
-    const hashedPassword = await bcrypt.hash(password, 8)
+const Task = require('./models/task')
+const User = require('./models/user')
 
-    console.log(password)
-    console.log(hashedPassword)
+const main = async () => {
+    // const task = await Task.findById('63595201e143e7623cf6139f')
+    // await task.populate('owner') //.execPopulate() -> deprecated
+    // console.log(task.owner)
 
-    const isMatch = await bcrypt.compare("Red12345!", hashedPassword)
-    console.log(isMatch)
+    const user = await User.findById('635951210888e11c4c79fab4')
+    await user.populate('tasks')
+    console.log(user.tasks)
 }
 
-myFunction()
+main()
