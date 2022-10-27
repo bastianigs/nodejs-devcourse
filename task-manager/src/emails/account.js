@@ -1,7 +1,7 @@
 const sgMail = require('@sendgrid/mail')
 
-const defEmail = 'sebastianigescu@trash-mail.com'
-const sgApiKey = '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'
+const defEmail = ''
+const sgApiKey = ''
 sgMail.setApiKey(sgApiKey)
 
 // ----------------------------------------------
