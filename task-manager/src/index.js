@@ -7,6 +7,32 @@ const taskRouter = require('./routers/task')
 const app = express();
 const port = process.env.PORT || 3000;
 
+
+// FILE UPLOADING --------------------
+// const multer = require('multer')
+// const upload = multer({
+//     dest: 'images',
+//     limits: {
+//         fileSize: 1000000
+//     },
+//     fileFilter(req, file, cb) {
+//         if (!file.originalname.match(/\.(doc|docx)$/)) return cb(new Error('Please upload a document!'))
+
+//         cb(undefined, true)
+//         // cb(new Error('File must be a pdf'))
+//         // cb(undefined, true) // upload should be expected
+//         // cb(undefined, false) // silently reject the upload
+//     }
+// })
+
+// app.post('/upload', upload.single('upload'), (req, res) => {     //, upload.single('upload'), (req, res) => {
+//     res.send()
+// }, (error, req, res, next) => {
+//     res.status(400).send({
+//         error: error.message
+//     })
+// })
+
 //--------------------------------------------------------------
 
 // app.use((req, res, next) => {
@@ -30,17 +56,17 @@ app.listen( port, () => {
 })
 
 
-const Task = require('./models/task')
-const User = require('./models/user')
+// const Task = require('./models/task')
+// const User = require('./models/user')
 
-const main = async () => {
-    // const task = await Task.findById('63595201e143e7623cf6139f')
-    // await task.populate('owner') //.execPopulate() -> deprecated
-    // console.log(task.owner)
+// const main = async () => {
+//     // const task = await Task.findById('63595201e143e7623cf6139f')
+//     // await task.populate('owner') //.execPopulate() -> deprecated
+//     // console.log(task.owner)
 
-    const user = await User.findById('635951210888e11c4c79fab4')
-    await user.populate('tasks')
-    console.log(user.tasks)
-}
+//     const user = await User.findById('635951210888e11c4c79fab4')
+//     await user.populate('tasks')
+//     console.log(user.tasks)
+// }
 
-main()
+// main()
