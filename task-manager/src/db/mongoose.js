@@ -1,9 +1,6 @@
 const mongoose = require( 'mongoose' );
 
-const dbURL = dbName => 
-    "mongodb+srv://dbUser:dbUserPassword@cluster0.h9dzpph.mongodb.net/" + encodeURIComponent(dbName) + "?retryWrites=true&w=majority";
-
-mongoose.connect( dbURL( 'task-manager-api' ) );
+mongoose.connect( process.env.MONGODB_URL );
 
 // ---------------------------------------------------------
 
